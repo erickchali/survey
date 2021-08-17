@@ -1,0 +1,52 @@
+version: '3.8'
+services:
+  api:
+    build:
+      context: ../
+      dockerfile: deployment/Dockerfile
+      target: development
+    volumes:
+      - ..:/usr/src/app
+      - /usr/src/app/dist
+      - /usr/src/app/node_modules
+    ports:
+      - "23000:3000" # for application
+      - "29229:9229" # if `yarn run start:debug` command is required, the debugger uses a port
+    command: yarn run start:dev
+    env_file:
+      - config/.env
+    depends_on:
+      - dynamodb
+      - postgres
+  postgres:
+    image: postgres:13-alpine
+    restart: on-failure
+    volumes:
+      - db_data:/var/lib/postgresql
+    env_file:
+      - config/.env
+    ports:
+      - "25432:5432"
+# ====== uncomment if you do not have a GUI to manage databases in your local machine ======
+#  adminer:
+#    image: adminer
+#    restart: always
+#    ports:
+#      - "28080:8080"
+  dynamodb:
+    image: amazon/dynamodb-local:latest
+    volumes:
+      - dynamodb_data:/home/dynamodblocal/data
+    ports:
+      - "28000:8000"
+  dynamodb-admin:
+    image: aaronshaf/dynamodb-admin
+    ports:
+      - "28001:8001"
+    env_file:
+      - config/.env
+    depends_on:
+      - dynamodb
+volumes:
+  dynamodb_data:
+  db_data:
