@@ -1,19 +1,24 @@
 PORT := 3000
 IMAGE_NAME := wello-service_1
 
-clean: format lint test
+clean: format lint tests
 
 install-dev:
-	NODE_ENV=development npx yarn install
+	NODE_ENV=development yarn install
+
+pipeline: lint tests check-vulnerabilities
 
 lint:
-	npx yarn lint
+	yarn lint
 
 tests:
-	npx yarn test:cov
+	yarn test:cov
 
 format:
-	npx yarn format
+	yarn format
+
+check-vulnerabilities:
+	yarn audit --level high
 
 launch-local:
 	docker context use default
