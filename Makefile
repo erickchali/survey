@@ -6,6 +6,9 @@ clean: format lint tests
 install-dev:
 	NODE_ENV=development yarn install
 
+install-dependencies:
+	yarn install
+
 pipeline: lint tests check-vulnerabilities
 
 lint:
